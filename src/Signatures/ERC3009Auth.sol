@@ -15,16 +15,18 @@ contract ERC3009Auth is ERC2612Auth {
 
     event AuthorizationCanceled(address indexed origin, bytes32 nonce);
 
-    bytes32 constant TRANSFER_WITH_AUTHORIZATION_TYPEHASH =
+    bytes32 public constant TRANSFER_WITH_AUTHORIZATION_TYPEHASH =
         keccak256(
             "TransferWithAuthorization(address origin,address target,uint256 value,uint256 validAfter,uint256 validBefore,bytes32 nonce)"
         );
-    bytes32 constant RECEIVE_WITH_AUTHORIZATION_TYPEHASH =
+    bytes32 public constant RECEIVE_WITH_AUTHORIZATION_TYPEHASH =
         keccak256(
             "ReceiveWithAuthorization(address origin,address target,uint256 value,uint256 validAfter,uint256 validBefore,bytes32 nonce)"
         );
 
-    constructor() ERC20("ERC3009", "PP") ERC2612Auth("ERC3009Auth") {}
+    constructor() ERC20("ERC3009", "PP") ERC2612Auth("ERC3009Auth") {
+        _mint(msg.sender, 100_000 ether);
+    }
 
     function transferWithAuthorization(
         address origin,
@@ -50,7 +52,7 @@ contract ERC3009Auth is ERC2612Auth {
             s
         );
 
-        transferFrom(origin, target, amount);
+        _transfer(origin, target, amount);
         emit AuthApplied(origin, target, nonce);
     }
 
@@ -80,7 +82,7 @@ contract ERC3009Auth is ERC2612Auth {
             s
         );
 
-        transferFrom(target, origin, amount);
+        _transfer(origin, target, amount);
         emit AuthApplied(origin, target, nonce);
     }
 }

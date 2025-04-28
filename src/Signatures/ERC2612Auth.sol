@@ -12,14 +12,12 @@ abstract contract ERC2612Auth is ERC20, EIP712 {
     error InvalidAddress();
     error InvalidAmount();
     error NonceAlreadyUsed();
+    error NonceNotFound();
 
     event AuthGranted(
         address indexed owner,
         address indexed spender,
-        uint256 value,
-        uint256 validAfter,
-        uint256 expiration,
-        bytes32 nonce
+        uint256 value
     );
 
     event AuthCancelled(
@@ -28,12 +26,12 @@ abstract contract ERC2612Auth is ERC20, EIP712 {
         uint256 timestamp
     );
 
-    bytes32 constant ALLOWENCE_TYPEHASH =
+    bytes32 public constant ALLOWANCE_TYPEHASH =
         keccak256(
-            "AllowenceGranted(address owner,address spender,uint256 amount,uint256 validAfter,uint256 expiration,bytes32 nonce)"
+            "AllowanceGranted(address owner,address spender,uint256 amount,uint256 validAfter,uint256 expiration,bytes32 nonce)"
         );
 
-    bytes32 constant CANCEL_AUTHORIZATION_TYPEHASH =
+    bytes32 public constant CANCEL_AUTHORIZATION_TYPEHASH =
         keccak256("AuthCancelled(address origin,bytes32 nonce)");
 
     mapping(address => mapping(bytes32 => bool)) public userNonces;
@@ -60,12 +58,13 @@ abstract contract ERC2612Auth is ERC20, EIP712 {
         require(owner != address(0), InvalidAddress());
         require(spender != address(0), InvalidAddress());
         require(amount > 0, InvalidAmount());
-        require(block.timestamp > validAfter, InactiveSignature());
+        require(expiration > validAfter, InvalidSignature());
         require(block.timestamp < expiration, ExpiredSignature());
+        require(validAfter >= block.timestamp, InactiveSignature()); // optimize checks
 
         _updateNonces(owner, nonce);
 
-        bytes32 structHash = keccak256(
+        bytes32 dataHash = keccak256(
             abi.encode(
                 typeHash,
                 owner,
@@ -77,9 +76,9 @@ abstract contract ERC2612Auth is ERC20, EIP712 {
             )
         );
 
-        bytes32 digest = _hashTypedDataV4(structHash);
-        address signer = ECDSA.recover(digest, v, r, s);
+        bytes32 digest = _hashTypedDataV4(dataHash);
 
+        address signer = ECDSA.recover(digest, v, r, s);
         require(signer == owner, InvalidSignature());
     }
 
@@ -95,7 +94,7 @@ abstract contract ERC2612Auth is ERC20, EIP712 {
         bytes32 s
     ) public virtual {
         _validateSignature(
-            ALLOWENCE_TYPEHASH,
+            ALLOWANCE_TYPEHASH,
             owner,
             spender,
             amount,
@@ -109,7 +108,7 @@ abstract contract ERC2612Auth is ERC20, EIP712 {
 
         _approve(owner, spender, amount);
 
-        emit AuthGranted(owner, spender, amount, validAfter, expiration, nonce);
+        emit AuthGranted(owner, spender, amount);
     }
 
     // @dev This function is used to cancel a previously signed authorization by 'using' the nonce.
