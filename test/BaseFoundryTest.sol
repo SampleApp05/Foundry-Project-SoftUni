@@ -4,7 +4,7 @@ pragma solidity 0.8.28;
 import {Test, console} from "forge-std/Test.sol";
 
 contract BaseFoundryTest is Test {
-    uint256 currentUserId = 0x6;
+    uint256 currentUserId = 10;
 
     address public constant addressZero = address(0x0);
     address public immutable self;
@@ -15,21 +15,33 @@ contract BaseFoundryTest is Test {
 
     constructor() {
         self = address(this);
-        vm.deal(self, 100 ether);
+        vm.deal(self, 10_000 ether);
 
-        (owner, ) = createUser(100);
-        (validUser, ) = createUser(100);
-        (invalidUser, ) = createUser(0);
+        owner = createUserAddress(0x1, 100);
+        validUser = createUserAddress(0x2, 100);
+        invalidUser = createUserAddress(0x3, 0);
+    }
+
+    function createUserAddress(
+        uint256 key,
+        uint256 amount
+    ) private returns (address) {
+        address user = vm.addr(key);
+
+        if (amount > 0) {
+            vm.deal(user, amount * 1 ether);
+        }
+        return user;
     }
 
     function createUser(uint256 amount) public returns (address, uint256) {
-        currentUserId++;
         address user = vm.addr(currentUserId);
 
         if (amount > 0) {
             vm.deal(user, amount * 1 ether);
         }
         customUsers[currentUserId] = user;
+        currentUserId++;
 
         return (user, currentUserId);
     }
@@ -44,8 +56,11 @@ contract BaseFoundryTest is Test {
     }
 
     function mineMultiple(uint8 blocks) public {
-        for (uint8 i = 0; i < blocks; i++) {
+        for (uint8 i = 0; i < blocks; ) {
             mine();
+            unchecked {
+                i++;
+            }
         }
     }
 
