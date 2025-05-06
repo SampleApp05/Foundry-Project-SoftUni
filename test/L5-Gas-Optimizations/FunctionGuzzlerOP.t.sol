@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.28;
 
-// import {console} from "forge-std/Test.sol";
-import {BaseFoundryTest} from "./BaseFoundryTest.sol";
-import {FunctionGuzzler} from "../src/FunctionGuzzler.sol";
+import {console} from "forge-std/Test.sol";
+import {BaseFoundryTest} from "../BaseFoundryTest.sol";
+import {FunctionGuzzlerOP} from "src/L5-Gas-Optimizations/FunctionGuzzlerOP.sol";
 
-contract FunctionGuzzlerTest is BaseFoundryTest {
-    FunctionGuzzler public sut;
+contract FunctionGuzzlerOPTests is BaseFoundryTest {
+    FunctionGuzzlerOP public sut;
 
     function setUp() public {
-        sut = new FunctionGuzzler();
+        sut = new FunctionGuzzlerOP();
     }
 
     function addUsers(uint256 depositAmount) private {
@@ -50,7 +50,7 @@ contract FunctionGuzzlerTest is BaseFoundryTest {
     function testAddValue() public {
         sut.registerUser();
         sut.addValue(10);
-        assertEq(sut.totalValue(), 10);
+        assertEq(sut.totalAmount(), 10);
     }
 
     function testSumValues() public {
@@ -62,7 +62,7 @@ contract FunctionGuzzlerTest is BaseFoundryTest {
     function testDeposit() public {
         sut.registerUser();
         sut.deposit(100);
-        assertEq(sut.balances(self), 100);
+        assertEq(sut.getBalance(self), 100);
     }
 
     function testFindUser() public {
@@ -79,8 +79,8 @@ contract FunctionGuzzlerTest is BaseFoundryTest {
         sut.transfer(self, 100);
         vm.stopPrank();
 
-        assertEq(sut.balances(self), 100);
-        assertEq(sut.balances(validUser), 900);
+        assertEq(sut.getBalance(self), 100);
+        assertEq(sut.getBalance(validUser), 900);
     }
 
     function testAverageValue() public {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.28;
 
-import {ERC3009Auth} from "../../src/Signatures/ERC3009Auth.sol";
+import {ERC3009Auth} from "src/L7-Signatures/ERC3009Auth.sol";
 
 contract MockERC3009AuthContract is ERC3009Auth {
     constructor() ERC3009Auth() {}

@@ -2,13 +2,17 @@
 pragma solidity 0.8.28;
 
 import {console} from "forge-std/Test.sol";
-import {BaseFoundryTest} from "./BaseFoundryTest.sol";
-import {TicketNFT} from "../src/TicketNFT.sol";
-import {TestTokenReceiverContract} from "./TestTokenReceiverContract.sol";
+import {BaseFoundryTest} from "../BaseFoundryTest.sol";
+import {TicketNFT} from "src/L3-Foundry-Toolchain/TicketNFT.sol";
+import {TestTokenReceiverContract} from "../TestTokenReceiverContract.sol";
 import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 contract TicketNFTTest is BaseFoundryTest, TestTokenReceiverContract {
-    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
+    event Transfer(
+        address indexed from,
+        address indexed to,
+        uint256 indexed tokenId
+    );
 
     string constant NAME = "TicketNFT";
     string constant SYMBOL = "TICKET";
@@ -72,21 +76,25 @@ contract TicketNFTTest is BaseFoundryTest, TestTokenReceiverContract {
     }
 
     function test_RevertOnInvalidIndex() public {
-        vm.expectRevert(abi.encodeWithSelector(
-            ERC721Enumerable.ERC721OutOfBoundsIndex.selector,
-            addressZero,
-            1000
-        ));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                ERC721Enumerable.ERC721OutOfBoundsIndex.selector,
+                addressZero,
+                1000
+            )
+        );
 
         sut.tokenByIndex(1000);
     }
 
     function test_revertInvalidOwner() public {
-        vm.expectRevert(abi.encodeWithSelector(
-            ERC721Enumerable.ERC721OutOfBoundsIndex.selector,
-            self,
-            0
-        ));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                ERC721Enumerable.ERC721OutOfBoundsIndex.selector,
+                self,
+                0
+            )
+        );
 
         sut.tokenOfOwnerByIndex(self, 0);
     }

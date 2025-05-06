@@ -4,7 +4,7 @@ pragma solidity 0.8.28;
 import {Test, console} from "forge-std/Test.sol";
 import {BaseFoundryTest} from "../BaseFoundryTest.sol";
 import {MockERC3009AuthContract} from "./MockERC3009AuthContract.sol";
-import {ERC2612Auth} from "../../src/Signatures/ERC2612Auth.sol";
+import {ERC2612Auth} from "src/L7-Signatures/ERC2612Auth.sol";
 
 contract AuthTest is Test {
     MockERC3009AuthContract public sut;

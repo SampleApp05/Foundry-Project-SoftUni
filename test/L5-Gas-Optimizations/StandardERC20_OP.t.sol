@@ -2,14 +2,14 @@
 pragma solidity 0.8.28;
 
 import {console} from "forge-std/Test.sol";
-import {BaseFoundryTest} from "./BaseFoundryTest.sol";
-import {StandardERC20} from "../src/StandardERC20.sol";
+import {BaseFoundryTest} from "../BaseFoundryTest.sol";
+import {StandardERC20_OP} from "src/L5-Gas-Optimizations/StandardERC20_OP.sol";
 
 contract StandardERC20Tests is BaseFoundryTest {
-    StandardERC20 public sut;
+    StandardERC20_OP public sut;
 
     function setUp() public {
-        sut = new StandardERC20("Normal", "NTR", 18, 1000 ether);
+        sut = new StandardERC20_OP("Normal", "NTR", 18, 1000 ether);
     }
 
     function testTransfer() public {

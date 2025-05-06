@@ -2,17 +2,17 @@
 pragma solidity 0.8.28;
 
 import {Test, console} from "forge-std/Test.sol";
-import {BaseFoundryTest} from "./BaseFoundryTest.sol";
-import {StakingContractOP} from "../src/StakingContractOP.sol";
-import {StandardERC20_OP} from "../src/StandardERC20_OP.sol";
+import {BaseFoundryTest} from "../BaseFoundryTest.sol";
+import {StakingContract} from "src/L5-Gas-Optimizations/StakingContract.sol";
+import {StandardERC20_OP} from "src/L5-Gas-Optimizations/StandardERC20_OP.sol";
 
 contract StakingContractTests is BaseFoundryTest {
     StandardERC20_OP public token;
-    StakingContractOP public sut;
+    StakingContract public sut;
 
     function setUp() public {
         token = new StandardERC20_OP("Token", "TT", 18, 1_000_000 ether);
-        sut = new StakingContractOP(address(token));
+        sut = new StakingContract(address(token));
 
         token.transfer(validUser, 100 ether);
     }

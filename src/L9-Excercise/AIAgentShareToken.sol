@@ -57,7 +57,9 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
     constructor(
         address initialOwner,
         uint256 _fundingAmount,
-        address _relayer
+        address _relayer,
+        bytes32 _whitelistHash,
+        uint256 _expirationDate
     )
         validateAddress(initialOwner)
         ERC20("AIAgentShare ", "AIS")
@@ -66,7 +68,8 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
     {
         fundingAmount = _fundingAmount;
         relayer = _relayer;
-        expirationDate = block.timestamp + 30 days; // 30 days from deployment
+        whitelisteParticipantsHash = _whitelistHash;
+        expirationDate = _expirationDate;
 
         _mint(initialOwner, fundingAmount);
     }
@@ -128,12 +131,6 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
         return (index, mask);
     }
 
-    function _hasClaimedTokens(uint256 userID) internal view returns (bool) {
-        (uint256 index, uint256 mask) = _createClaimBitMaskData(userID);
-
-        return (whitelistClaimTracker[index] & mask) != 0;
-    }
-
     function _updateClaimStatus(uint256 userID) internal {
         (uint256 index, uint256 mask) = _createClaimBitMaskData(userID);
 
@@ -147,7 +144,7 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
         uint256 amountToPurchase,
         bytes32[] memory proof
     ) internal virtual {
-        require(_hasClaimedTokens(userID) == false, HasClaimedTokens());
+        require(hasClaimedTokens(userID) == false, HasClaimedTokens());
         _updateClaimStatus(userID);
 
         require(
@@ -178,6 +175,12 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
     }
 
     // MARK: - Public functions
+    function hasClaimedTokens(uint256 userID) public view returns (bool) {
+        (uint256 index, uint256 mask) = _createClaimBitMaskData(userID);
+
+        return (whitelistClaimTracker[index] & mask) != 0;
+    }
+
     function purchase(
         uint256 userID,
         uint256 amount,

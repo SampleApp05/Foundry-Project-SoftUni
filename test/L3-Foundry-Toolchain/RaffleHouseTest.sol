@@ -2,10 +2,10 @@
 pragma solidity 0.8.28;
 
 import {console} from "forge-std/Test.sol";
-import {BaseFoundryTest} from "./BaseFoundryTest.sol";
-import {RaffleHouse} from "../src/RaffleHouse.sol";
-import {TicketNFT} from "../src/TicketNFT.sol";
-import {TestTokenReceiverContract} from "./TestTokenReceiverContract.sol";
+import {BaseFoundryTest} from "../BaseFoundryTest.sol";
+import {RaffleHouse} from "src/L3-Foundry-Toolchain/RaffleHouse.sol";
+import {TicketNFT} from "src/L3-Foundry-Toolchain/TicketNFT.sol";
+import {TestTokenReceiverContract} from "../TestTokenReceiverContract.sol";
 // import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 contract RaffleHouseTest is BaseFoundryTest, TestTokenReceiverContract {

@@ -42,6 +42,7 @@ export interface AIAgentShareInterface extends Interface {
       | "finalizeFundingRound"
       | "fundingAmount"
       | "hasBeenFinalized"
+      | "hasClaimedTokens"
       | "name"
       | "owner"
       | "purchase"
@@ -140,6 +141,10 @@ export interface AIAgentShareInterface extends Interface {
     functionFragment: "hasBeenFinalized",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "hasClaimedTokens",
+    values: [BigNumberish]
+  ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
@@ -227,6 +232,10 @@ export interface AIAgentShareInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "hasBeenFinalized",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "hasClaimedTokens",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
@@ -468,6 +477,12 @@ export interface AIAgentShare extends BaseContract {
 
   hasBeenFinalized: TypedContractMethod<[], [boolean], "view">;
 
+  hasClaimedTokens: TypedContractMethod<
+    [userID: BigNumberish],
+    [boolean],
+    "view"
+  >;
+
   name: TypedContractMethod<[], [string], "view">;
 
   owner: TypedContractMethod<[], [string], "view">;
@@ -602,6 +617,9 @@ export interface AIAgentShare extends BaseContract {
   getFunction(
     nameOrSignature: "hasBeenFinalized"
   ): TypedContractMethod<[], [boolean], "view">;
+  getFunction(
+    nameOrSignature: "hasClaimedTokens"
+  ): TypedContractMethod<[userID: BigNumberish], [boolean], "view">;
   getFunction(
     nameOrSignature: "name"
   ): TypedContractMethod<[], [string], "view">;
