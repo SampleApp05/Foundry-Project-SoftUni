@@ -82,6 +82,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.EIP712__factory>;
     getContractFactory(
+      name: "MerkleProof",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MerkleProof__factory>;
+    getContractFactory(
       name: "ERC165",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC165__factory>;
@@ -157,6 +161,10 @@ declare module "hardhat/types/runtime" {
       name: "ERC3009Auth",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ERC3009Auth__factory>;
+    getContractFactory(
+      name: "AIAgentShare",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AIAgentShare__factory>;
 
     getContractAt(
       name: "Ownable",
@@ -243,6 +251,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.EIP712>;
+    getContractAt(
+      name: "MerkleProof",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MerkleProof>;
     getContractAt(
       name: "ERC165",
       address: string | ethers.Addressable,
@@ -338,6 +351,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.ERC3009Auth>;
+    getContractAt(
+      name: "AIAgentShare",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AIAgentShare>;
 
     deployContract(
       name: "Ownable",
@@ -407,6 +425,10 @@ declare module "hardhat/types/runtime" {
       name: "EIP712",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.EIP712>;
+    deployContract(
+      name: "MerkleProof",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MerkleProof>;
     deployContract(
       name: "ERC165",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -483,6 +505,10 @@ declare module "hardhat/types/runtime" {
       name: "ERC3009Auth",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ERC3009Auth>;
+    deployContract(
+      name: "AIAgentShare",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AIAgentShare>;
 
     deployContract(
       name: "Ownable",
@@ -569,6 +595,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.EIP712>;
+    deployContract(
+      name: "MerkleProof",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MerkleProof>;
     deployContract(
       name: "ERC165",
       args: any[],
@@ -664,6 +695,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ERC3009Auth>;
+    deployContract(
+      name: "AIAgentShare",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AIAgentShare>;
 
     // default types
     getContractFactory(

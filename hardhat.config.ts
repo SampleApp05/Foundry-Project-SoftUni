@@ -1,17 +1,11 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
-// import "@nomicfoundation/hardhat-foundry";
-import * as dotenv from "dotenv";
 
-// require("hardhat-foundry");
-
-dotenv.config();
-
-const config: HardhatUserConfig = {
+const config = {
   solidity: {
     version: "0.8.28",
     settings: {
-      evmVersion: "cancun",
+      evmVersion: "cancun", // seems to be required for the latest hardhat || will use Paris evm
       optimizer: {
         enabled: true,
         runs: 200,

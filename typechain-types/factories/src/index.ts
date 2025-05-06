@@ -4,3 +4,4 @@
 export * as l3FoundryToolchain from "./L3-Foundry-Toolchain";
 export * as l5GasOptimizations from "./L5-Gas-Optimizations";
 export * as l7Signatures from "./L7-Signatures";
+export * as l9Excercise from "./L9-Excercise";

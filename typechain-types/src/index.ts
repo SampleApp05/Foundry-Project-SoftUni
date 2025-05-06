@@ -7,3 +7,5 @@ import type * as l5GasOptimizations from "./L5-Gas-Optimizations";
 export type { l5GasOptimizations };
 import type * as l7Signatures from "./L7-Signatures";
 export type { l7Signatures };
+import type * as l9Excercise from "./L9-Excercise";
+export type { l9Excercise };
