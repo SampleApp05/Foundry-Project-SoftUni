@@ -20,6 +20,10 @@ contract MockAIAgentShare is AIAgentShare {
         )
     {}
 
+    function hashedSignatureData(bytes32 data) public view returns (bytes32) {
+        return _hashTypedDataV4(data);
+    }
+
     function mockValidateSignature(
         bytes32 typeHash,
         address authorizer,
@@ -31,28 +35,28 @@ contract MockAIAgentShare is AIAgentShare {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) internal virtual {
-        _validateSignature(
-            typeHash,
-            authorizer,
-            target,
-            amount,
-            validAfter,
-            expiration,
-            nonce,
-            v,
-            r,
-            s
-        );
+    ) public virtual returns (bool) {
+        return
+            _validateSignature(
+                typeHash,
+                authorizer,
+                target,
+                amount,
+                validAfter,
+                expiration,
+                nonce,
+                v,
+                r,
+                s
+            );
     }
 
     function mockValidateParticipant(
-        uint256 userID,
         address target,
         uint256 amount,
         bytes32[] memory proof
     ) public view returns (bool) {
-        return _validateParticipant(userID, target, amount, proof);
+        return _validateParticipant(target, amount, proof);
     }
 
     function mockCreateClaimBitMaskData(
@@ -61,7 +65,7 @@ contract MockAIAgentShare is AIAgentShare {
         return _createClaimBitMaskData(userID);
     }
 
-    function mockUpdateClaimStatus(uint256 userID) internal {
+    function mockUpdateClaimStatus(uint256 userID) public {
         _updateClaimStatus(userID);
     }
 }

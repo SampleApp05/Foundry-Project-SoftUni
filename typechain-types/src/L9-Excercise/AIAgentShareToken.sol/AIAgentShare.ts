@@ -53,6 +53,7 @@ export interface AIAgentShareInterface extends Interface {
       | "transfer"
       | "transferFrom"
       | "transferOwnership"
+      | "userNonces"
       | "whitelistClaimTracker"
       | "whitelisteParticipantsHash"
   ): FunctionFragment;
@@ -174,6 +175,10 @@ export interface AIAgentShareInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "userNonces",
+    values: [AddressLike, BytesLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "whitelistClaimTracker",
     values: [BigNumberish]
   ): string;
@@ -260,6 +265,7 @@ export interface AIAgentShareInterface extends Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "userNonces", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "whitelistClaimTracker",
     data: BytesLike
@@ -519,6 +525,12 @@ export interface AIAgentShare extends BaseContract {
     "nonpayable"
   >;
 
+  userNonces: TypedContractMethod<
+    [arg0: AddressLike, arg1: BytesLike],
+    [boolean],
+    "view"
+  >;
+
   whitelistClaimTracker: TypedContractMethod<
     [arg0: BigNumberish],
     [bigint],
@@ -662,6 +674,13 @@ export interface AIAgentShare extends BaseContract {
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "userNonces"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: BytesLike],
+    [boolean],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "whitelistClaimTracker"
   ): TypedContractMethod<[arg0: BigNumberish], [bigint], "view">;

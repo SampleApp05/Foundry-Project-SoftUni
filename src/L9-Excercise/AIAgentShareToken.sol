@@ -2,6 +2,7 @@
 // Compatible with OpenZeppelin Contracts ^5.0.0
 pragma solidity 0.8.28;
 
+import {console} from "forge-std/console.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
@@ -24,6 +25,9 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
     error RelayerOnlyAccess();
     error InvalidParticipantIndex();
     error HasClaimedTokens();
+    error NonceAlreadyUsed();
+    error ExpiredSignature();
+    error InactiveSignature();
 
     bytes32 public constant DELEGATE_PURCHASE_TYPE_HASH =
         keccak256(
@@ -35,13 +39,14 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
     uint256 public constant RELAYER_REWARD = 5 * 10 ** 18; // 5 tokens
     uint256 public constant TOTAL_PARTICIPANTS = 300;
 
-    bytes32 public immutable whitelisteParticipantsHash;
+    bytes32 public immutable whitelistedParticipantsHash;
     uint256 public immutable expirationDate;
     address public immutable relayer;
 
     uint256 public fundingAmount;
     bool public hasBeenFinalized;
 
+    mapping(address => mapping(bytes32 => bool)) public userNonces;
     uint256[2] public whitelistClaimTracker; // must know whitelist size
 
     modifier onlyRelayer() {
@@ -50,7 +55,9 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
     }
 
     modifier validateAddress(address target) {
+        //console.log("Address ------ ", target);
         require(target != address(0), InvalidAddress());
+        console.log("Address checked ------ ", target);
         _;
     }
 
@@ -62,19 +69,25 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
         uint256 _expirationDate
     )
         validateAddress(initialOwner)
+        validateAddress(_relayer)
         ERC20("AIAgentShare ", "AIS")
         Ownable(initialOwner)
         EIP712("AI Agent Share", "1")
     {
         fundingAmount = _fundingAmount;
         relayer = _relayer;
-        whitelisteParticipantsHash = _whitelistHash;
+        whitelistedParticipantsHash = _whitelistHash;
         expirationDate = _expirationDate;
 
         _mint(initialOwner, fundingAmount);
     }
 
     // MARK: - Internal functions
+    function _updateNonces(address owner, bytes32 nonce) private {
+        require(userNonces[owner][nonce] == false, NonceAlreadyUsed());
+        userNonces[owner][nonce] = true;
+    }
+
     function _validateSignature(
         bytes32 typeHash,
         address authorizer,
@@ -86,7 +99,21 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) internal virtual {
+    )
+        internal
+        virtual
+        validateAddress(authorizer)
+        validateAddress(target)
+        returns (bool)
+    {
+        require(amount > 0, InvalidAmount());
+        require(expiration > validAfter, InvalidSignature());
+        require(block.timestamp < expiration, ExpiredSignature());
+        require(block.timestamp > validAfter, InactiveSignature()); // optimize checks
+
+        console.log("C4");
+
+        _updateNonces(authorizer, nonce);
         bytes32 digest = _hashTypedDataV4(
             keccak256(
                 abi.encode(
@@ -102,19 +129,18 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
         );
 
         address signer = ECDSA.recover(digest, v, r, s);
-        require(signer == authorizer, InvalidSignature());
+        return signer == authorizer;
     }
 
     function _validateParticipant(
-        uint256 userID,
         address target,
         uint256 amount,
         bytes32[] memory proof
     ) internal view virtual returns (bool) {
         bytes32 leaf = keccak256(
-            bytes.concat(keccak256(abi.encode(userID, target, amount)))
+            bytes.concat(keccak256(abi.encode(target, amount)))
         );
-        return MerkleProof.verify(proof, whitelisteParticipantsHash, leaf);
+        return MerkleProof.verify(proof, whitelistedParticipantsHash, leaf);
     }
 
     function _createClaimBitMaskData(
@@ -148,7 +174,7 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
         _updateClaimStatus(userID);
 
         require(
-            _validateParticipant(userID, recepient, authorizedAmount, proof),
+            _validateParticipant(recepient, authorizedAmount, proof),
             UserNotWhitelisted()
         );
 
@@ -202,26 +228,26 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external payable onlyRelayer {
-        _validateSignature(
-            DELEGATE_PURCHASE_TYPE_HASH,
-            authorizer,
-            target,
-            amount,
-            validAfter,
-            expiration,
-            nonce,
-            v,
-            r,
-            s
+    ) public payable onlyRelayer {
+        require(
+            _validateSignature(
+                DELEGATE_PURCHASE_TYPE_HASH,
+                authorizer,
+                target,
+                amount,
+                validAfter,
+                expiration,
+                nonce,
+                v,
+                r,
+                s
+            ),
+            InvalidSignature()
         );
 
         _purchase(userID, authorizer, amount, amount - RELAYER_REWARD, proof);
 
-        if (RELAYER_REWARD > 0) {
-            _mint(msg.sender, RELAYER_REWARD);
-        }
-
+        _mint(msg.sender, RELAYER_REWARD);
         emit DelegatedPurchase(authorizer, target);
     }
 

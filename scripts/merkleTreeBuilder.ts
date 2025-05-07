@@ -106,8 +106,19 @@ let tree = StandardMerkleTree.of(usersData, ["address", "uint256"]);
 
 let data = Array.from(tree.entries()).map((item, index) => {
   let userID = index >= 20 ? 256 + (index % 20) : index; // mocking large data set
+  if (index == 0) {
+    console.log(
+      "Item data -----------------------------------------------------"
+    );
+    console.log(item);
+    console.log(tree.getProof(item[0]));
+    console.log(
+      "Item data end -----------------------------------------------------"
+    );
+  }
+
   return {
-    userID: userID,
+    userID: index,
     address: item[1][0],
     maxTokens: item[1][1],
     proof: tree.getProof(item[0]),
