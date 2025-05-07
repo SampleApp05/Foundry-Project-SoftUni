@@ -2,7 +2,6 @@
 // Compatible with OpenZeppelin Contracts ^5.0.0
 pragma solidity 0.8.28;
 
-import {console} from "forge-std/console.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {EIP712} from "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
@@ -55,9 +54,7 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
     }
 
     modifier validateAddress(address target) {
-        //console.log("Address ------ ", target);
         require(target != address(0), InvalidAddress());
-        console.log("Address checked ------ ", target);
         _;
     }
 
@@ -110,8 +107,6 @@ contract AIAgentShare is ERC20, Ownable, EIP712 {
         require(expiration > validAfter, InvalidSignature());
         require(block.timestamp < expiration, ExpiredSignature());
         require(block.timestamp > validAfter, InactiveSignature()); // optimize checks
-
-        console.log("C4");
 
         _updateNonces(authorizer, nonce);
         bytes32 digest = _hashTypedDataV4(
