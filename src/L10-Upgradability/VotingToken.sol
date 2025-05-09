@@ -7,7 +7,7 @@ import {ERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20P
 import {ERC20Votes} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import {Nonces} from "@openzeppelin/contracts/utils/Nonces.sol";
 
-contract MyToken is ERC20, ERC20Permit, ERC20Votes {
+contract VotingToken is ERC20, ERC20Permit, ERC20Votes {
     uint256 public constant DEPLOYER_REWARD = 1_000_000 * 10 ** 18; // 1 million tokens
 
     constructor() ERC20("VotingToken", "VT") ERC20Permit("VotingToken") {
@@ -26,5 +26,24 @@ contract MyToken is ERC20, ERC20Permit, ERC20Votes {
         address owner
     ) public view override(ERC20Permit, Nonces) returns (uint256) {
         return super.nonces(owner);
+    }
+
+    function delegateVotes() public {
+        super.delegate(msg.sender);
+    }
+
+    function delegateVotesTo(address target) public {
+        super.delegate(target);
+    }
+
+    function delegateVotesWithSignature(
+        address delegatee,
+        uint256 nonce,
+        uint256 expiry,
+        uint8 v,
+        bytes32 r,
+        bytes32 s
+    ) public {
+        super.delegateBySig(delegatee, nonce, expiry, v, r, s);
     }
 }
